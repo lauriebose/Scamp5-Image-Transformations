@@ -1,7 +1,6 @@
 #include "IMG_SKEW.hpp"
 #include "IMG_ROTATION.hpp"
 
-#include "IMG_SKEW.hpp"
 using namespace SCAMP5_PE;
 
 namespace IMGTF
@@ -10,7 +9,7 @@ namespace IMGTF
 	{
 		namespace ANALOG
 		{
-			void ROT_3SKEWS_F(double angle_radians)
+			void ROT_3SKEWS(areg_t reg, double angle_radians)
 			{
 				double skewY_val = tan_approx3(0.5*angle_radians);
 				double skewX_val = sin_approx3(angle_radians);
@@ -18,31 +17,17 @@ namespace IMGTF
 				double tan_val_Y = tan_approx3(M_PI*skewY_val*0.25);
 				double tan_val_X = tan_approx3(M_PI*skewX_val*0.25);
 
-				double temp_val = 33;
-				temp_val = temp_val/100.0;
-
-				IMGTF::SKEW::ANALOG::SKEWY_F_TAN_RAD(tan_val_Y,temp_val);
-
-				temp_val = 66;
-				temp_val = temp_val/100.0;
-
-				IMGTF::SKEW::ANALOG::SKEWX_F_TAN_RAD(tan_val_X,temp_val);
-
-				temp_val = 33;
-				temp_val = temp_val/100.0;
-
-				IMGTF::SKEW::ANALOG::SKEWY_F_TAN_RAD(tan_val_Y,temp_val);
+				IMGTF::SKEW::ANALOG::SKEWY_TAN_RAD(reg,tan_val_Y,0.33);
+				IMGTF::SKEW::ANALOG::SKEWX_TAN_RAD(reg,tan_val_X,0.66);
+				IMGTF::SKEW::ANALOG::SKEWY_TAN_RAD(reg,tan_val_Y,0.33);
 			}
 
-			void ROT_3SKEWS_AREG(AENUM target,double angle_radians)
+			void ROT_2SKEWS(areg_t reg,int rotation_steps)
 			{
-				copy_areg_into_F(target);
-				ROT_3SKEWS_F(angle_radians);
-				copy_F_into_areg(target);
-			}
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 
-			void ROT_2SKEWS_F(int rotation_steps)
-			{
 				//EACH STEP APPROXIMATELY 0.555... DEGRESS (FROM 1.0/1.8)
 				int current_rotation = rotation_steps;
 				if(current_rotation > 0)
@@ -61,17 +46,18 @@ namespace IMGTF
 						IMGTF::SKEW::ANALOG::STEP_SKEWY_ACW_F(n);
 					}
 				}
+
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 			}
 
-			void ROT_2SKEWS_AREG(AENUM target,int rotation_steps)
+			int STEP_ROT_2SKEWS(areg_t reg,int current_rot_value, bool rot_ACW)
 			{
-				copy_areg_into_F(target);
-				ROT_2SKEWS_F(rotation_steps);
-				copy_F_into_areg(target);
-			}
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 
-			int STEP_ROT_2SKEWS_F(int current_rot_value, bool rot_ACW)
-			{
 				//EACH STEP APPROXIMATELY 0.555... DEGRESS (FROM 1.0/1.8)
 				if(current_rot_value > 0)
 				{
@@ -121,15 +107,11 @@ namespace IMGTF
 						}
 					}
 				}
-				return current_rot_value;
-			}
 
-			int STEP_ROT_2SKEWS_AREG(AENUM target,int current_rot_value, bool rot_ACW)
-			{
-				copy_areg_into_F(target);
-				int ret = STEP_ROT_2SKEWS_F( current_rot_value,  rot_ACW);
-				copy_F_into_areg(target);
-				return ret;
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
+				return current_rot_value;
 			}
 		}
 	}

@@ -3,15 +3,8 @@
 
 using namespace SCAMP5_PE;
 
-#include "IMG_ROTATION.hpp"
-#include "IMG_ROTATION_DIGITAL.hpp"
-#include "IMG_SCALING.hpp"
-#include "IMG_SCALING_DIGITAL.hpp"
-#include "IMG_SKEW.hpp"
-#include "IMG_SKEW_DIGITAL.hpp"
-
-#ifndef IMG_TF
-#define IMG_TF
+#ifndef IMG_TF_HELPER
+#define IMG_TF_HELPER
 namespace IMGTF
 {
 	unsigned char reverse_byte(unsigned char x);

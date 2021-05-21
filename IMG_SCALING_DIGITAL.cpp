@@ -203,12 +203,11 @@ namespace IMGTF
 				return;
 			}
 
-
-
-
-
-			void SCALE_Y_R11(int scaling_mag,bool scale_down)
+			void SCALE_Y(dreg_t reg,int scaling_mag,bool scale_down)
 			{
+				scamp5_dynamic_kernel_begin();
+					MOV(R11,reg);
+				scamp5_dynamic_kernel_end();
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -223,11 +222,17 @@ namespace IMGTF
 						STEP_SCALE_DOWNY_R11(n);
 					}
 				}
+				scamp5_dynamic_kernel_begin();
+					MOV(reg,R11);
+				scamp5_dynamic_kernel_end();
 			}
 
 
-			void SCALE_X_R11(int scaling_mag,bool scale_down)
+			void SCALE_X(dreg_t reg,int scaling_mag,bool scale_down)
 			{
+				scamp5_dynamic_kernel_begin();
+					MOV(R11,reg);
+				scamp5_dynamic_kernel_end();
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -242,11 +247,17 @@ namespace IMGTF
 						STEP_SCALE_DOWNX_R11(n);
 					}
 				}
+				scamp5_dynamic_kernel_begin();
+					MOV(reg,R11);
+				scamp5_dynamic_kernel_end();
 			}
 
 
-			void SCALE_R11(int scaling_mag,bool scale_down)
+			void SCALE(dreg_t reg,int scaling_mag,bool scale_down)
 			{
+				scamp5_dynamic_kernel_begin();
+					MOV(R11,reg);
+				scamp5_dynamic_kernel_end();
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -261,13 +272,18 @@ namespace IMGTF
 						STEP_SCALE_DOWN_R11(n);
 					}
 				}
-
+				scamp5_dynamic_kernel_begin();
+					MOV(reg,R11);
+				scamp5_dynamic_kernel_end();
 			}
 
 
 
-			int STEP_SCALE_R11(int current_scaling_value, bool scale_DOWN)
+			int STEP_SCALE(dreg_t reg,int current_scaling_value, bool scale_DOWN)
 			{
+				scamp5_dynamic_kernel_begin();
+					MOV(R11,reg);
+				scamp5_dynamic_kernel_end();
 				if(current_scaling_value > 0)
 				{
 					if(!scale_DOWN)
@@ -316,6 +332,9 @@ namespace IMGTF
 						}
 					}
 				}
+				scamp5_dynamic_kernel_begin();
+					MOV(reg,R11);
+				scamp5_dynamic_kernel_end();
 				return current_scaling_value;
 			}
 
@@ -324,45 +343,23 @@ namespace IMGTF
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-			void SCALE_Y_DREG(DENUM target,int scaling_mag,bool scale_down)
+			void HALF_SCALE(dreg_t reg) //USES R11 R0 R12
 			{
-				copy_dreg_into_R11(target);
-				SCALE_Y_R11(scaling_mag,scale_down);
-				copy_R11_into_dreg(target);
-			}
-
-			void SCALE_X_DREG(DENUM target,int scaling_mag,bool scale_down)
-			{
-				copy_dreg_into_R11(target);
-				SCALE_X_R11(scaling_mag,scale_down);
-				copy_R11_into_dreg(target);
-			}
-
-			void SCALE_DREG(DENUM target,int scaling_mag,bool scale_down)
-			{
-				copy_dreg_into_R11(target);
-				SCALE_R11(scaling_mag,scale_down);
-				copy_R11_into_dreg(target);
-			}
-
-			int STEP_SCALE_DREG(DENUM target,int current_scaling_value, bool scale_DOWN)
-			{
-				copy_dreg_into_R11(target);
-				int ret = STEP_SCALE_R11( current_scaling_value,  scale_DOWN);
-				copy_R11_into_dreg(target);
-				return ret;
-			}
-
-			void HALF_SCALE_DREG(DENUM target) //USES R11 R0 R12
-			{
-				copy_dreg(DENUM::R12,target);
+				scamp5_dynamic_kernel_begin();
+					SET(R0);
+					MOV(R12,reg);
+				scamp5_dynamic_kernel_end();
 
 				scamp5_kernel_begin();
 					CLR(R1,R2,R3,R4);
 				scamp5_kernel_end();
-				load_rect_into_DREG(DENUM::R0,128,0,128,256);
-				for(int n = 0; n < 64 ; n++)
+
+				uint8_t x = 128;
+				uint8_t y = 0;
+				uint8_t w = 127;
+				uint8_t h = 255;
+				scamp5_load_rect(R0,y,x,y+h,x+w);
+				for(int n = 0; n < 128 ; n++)
 				{
 					scamp5_kernel_begin();
 						SET(R2);
@@ -378,8 +375,12 @@ namespace IMGTF
 					scamp5_kernel_end();
 				}
 
-				load_rect_into_DREG(DENUM::R0,0,0,128,256);
-				for(int n = 0; n < 64 ; n++)
+				x = 0;
+				y = 0;
+				w = 127;
+				h = 255;
+				scamp5_load_rect(R0,y,x,y+h,x+w);
+				for(int n = 0; n < 128 ; n++)
 				{
 					scamp5_kernel_begin();
 						SET(R4);
@@ -396,8 +397,12 @@ namespace IMGTF
 				}
 
 
-				load_rect_into_DREG(DENUM::R0,0,128,256,128);
-				for(int n = 0; n < 64 ; n++)
+				x = 0;
+				y = 128;
+				w = 255;
+				h = 127;
+				scamp5_load_rect(R0,y,x,y+h,x+w);
+				for(int n = 0; n < 128 ; n++)
 				{
 					scamp5_kernel_begin();
 						SET(R1);
@@ -413,8 +418,12 @@ namespace IMGTF
 					scamp5_kernel_end();
 				}
 
-				load_rect_into_DREG(DENUM::R0,0,0,256,128);
-				for(int n = 0; n < 64 ; n++)
+				x = 0;
+				y = 0;
+				w = 255;
+				h = 127;
+				scamp5_load_rect(R0,y,x,y+h,x+w);
+				for(int n = 0; n < 128 ; n++)
 				{
 					scamp5_kernel_begin();
 						SET(R3);
@@ -430,7 +439,9 @@ namespace IMGTF
 					scamp5_kernel_end();
 				}
 
-				copy_dreg(target,DENUM::R12);
+				scamp5_dynamic_kernel_begin();
+					MOV(reg,R12);
+				scamp5_dynamic_kernel_end();
 
 				scamp5_kernel_begin();
 					ALL();

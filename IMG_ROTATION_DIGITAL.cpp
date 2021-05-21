@@ -11,39 +11,26 @@ namespace IMGTF
 	{
 		namespace DIGITAL
 		{
-			void ROT_3SKEWS_R11(double angle_radians)
+
+			void ROT_3SKEWS(dreg_t reg, double angle_radians)
 			{
-				double skewY_val = tan_approx3(0.5*angle_radians);
-				double skewX_val = sin_approx3(angle_radians);
+				double skewY_val = IMGTF::tan_approx3(0.5*angle_radians);
+				double skewX_val = IMGTF::sin_approx3(angle_radians);
 
-				double tan_val_Y = tan_approx3(M_PI*skewY_val*0.25);
-				double tan_val_X = tan_approx3(M_PI*skewX_val*0.25);
+				double tan_val_Y = IMGTF::tan_approx3(M_PI*skewY_val*0.25);
+				double tan_val_X = IMGTF::tan_approx3(M_PI*skewX_val*0.25);
 
-				double temp_val = 33;
-				temp_val = temp_val/100.0;
-
-				IMGTF::SKEW::DIGITAL::SKEWY_R11_TAN_RAD(tan_val_Y,temp_val);
-
-				temp_val = 66;
-				temp_val = temp_val/100.0;
-
-				IMGTF::SKEW::DIGITAL::SKEWX_R11_TAN_RAD(tan_val_X,temp_val);
-
-				temp_val = 33;
-				temp_val = temp_val/100.0;
-
-				IMGTF::SKEW::DIGITAL::SKEWY_R11_TAN_RAD(tan_val_Y,temp_val);
+				IMGTF::SKEW::DIGITAL::SKEWY_TAN_RAD(reg,tan_val_Y,0.33);
+				IMGTF::SKEW::DIGITAL::SKEWX_TAN_RAD(reg,tan_val_X,0.66);
+				IMGTF::SKEW::DIGITAL::SKEWY_TAN_RAD(reg,tan_val_Y,0.33);
 			}
 
-			void ROT_3SKEWS_DREG(DENUM target, double angle_radians)
+			void ROT_2SKEWS(dreg_t reg, int rotation_steps)
 			{
-				copy_dreg_into_R11(target);
-				ROT_3SKEWS_R11(angle_radians);
-				copy_R11_into_dreg(target);
-			}
+				scamp5_dynamic_kernel_begin();
+					MOV(R11,reg);
+				scamp5_dynamic_kernel_end();
 
-			void ROT_2SKEWS_R11(int rotation_steps)
-			{
 				//EACH STEP APPROXIMATELY 0.555... DEGRESS (FROM 1.0/1.8)
 				int current_rotation = rotation_steps;
 				if(current_rotation > 0)
@@ -62,17 +49,18 @@ namespace IMGTF
 						IMGTF::SKEW::DIGITAL::STEP_SKEWY_ACW_R11(n);
 					}
 				}
+
+				scamp5_dynamic_kernel_begin();
+					MOV(reg,R11);
+				scamp5_dynamic_kernel_end();
 			}
 
-			void ROT_2SKEWS_DREG(DENUM target,int rotation_steps)
+			int STEP_ROT_2SKEWS(dreg_t reg, int current_rot_value, bool rot_ACW)
 			{
-				copy_dreg_into_R11(target);
-				ROT_2SKEWS_R11(rotation_steps);
-				copy_R11_into_dreg(target);
-			}
+				scamp5_dynamic_kernel_begin();
+					MOV(R11,reg);
+				scamp5_dynamic_kernel_end();
 
-			int STEP_ROT_2SKEWS_R11(int current_rot_value, bool rot_ACW)
-			{
 				//EACH STEP APPROXIMATELY 0.555... DEGRESS (FROM 1.0/1.8)
 				if(current_rot_value > 0)
 				{
@@ -122,17 +110,13 @@ namespace IMGTF
 						}
 					}
 				}
+
+				scamp5_dynamic_kernel_begin();
+					MOV(reg,R11);
+				scamp5_dynamic_kernel_end();
+
 				return current_rot_value;
 			}
-
-			int STEP_ROT_2SKEWS_R11(DENUM target, int current_rot_value, bool rot_ACW)
-			{
-				copy_dreg_into_R11(target);
-				int ret = STEP_ROT_2SKEWS_R11(current_rot_value, rot_ACW);
-				copy_R11_into_dreg(target);
-				return ret;
-			}
-
 		}
 	}
 }

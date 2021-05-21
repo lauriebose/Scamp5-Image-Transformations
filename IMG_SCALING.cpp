@@ -1,8 +1,4 @@
-#include "MISC_FUNCTIONS.hpp"
 #include "IMG_SCALING.hpp"
-
-#include "MISC_FUNCTIONS.hpp"
-
 
 static const int scaling_rowcol_order[] = {
 		64, 32, 98, 16, 83, 50, 118, 8, 77, 43, 113, 26, 97, 62, 4, 77, 41, 114, 23, 97, 61, 14, 90, 53, 34, 113, 74, 2,
@@ -172,8 +168,11 @@ namespace IMGTF
 
 
 
-			void SCALE_Y_F(int scaling_mag, bool scale_down)
+			void SCALE_Y(areg_t reg,int scaling_mag, bool scale_down)
 			{
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -188,11 +187,17 @@ namespace IMGTF
 						STEP_SCALE_DOWNY_F(n);
 					}
 				}
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 			}
 
 
-			void SCALE_X_F(int scaling_mag, bool scale_down)
+			void SCALE_X(areg_t reg,int scaling_mag, bool scale_down)
 			{
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -207,11 +212,17 @@ namespace IMGTF
 						STEP_SCALE_DOWNX_F(n);
 					}
 				}
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 			}
 
 
-			void SCALE_F(int scaling_mag, bool scale_down)
+			void SCALE(areg_t reg,int scaling_mag, bool scale_down)
 			{
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -226,12 +237,18 @@ namespace IMGTF
 						STEP_SCALE_DOWN_F(n);
 					}
 				}
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 			}
 
 
 
-			int STEP_SCALE_F(int current_scaling_value, bool scale_DOWN)
+			int STEP_SCALE(areg_t reg,int current_scaling_value, bool scale_DOWN)
 			{
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 				if(current_scaling_value > 0)
 				{
 					if(!scale_DOWN)
@@ -280,555 +297,89 @@ namespace IMGTF
 						}
 					}
 				}
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 				return current_scaling_value;
 			}
 
 
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-			void SCALE_Y_AREG(AENUM target, int scaling_mag, bool scale_down)
+			void HALF_SCALE(areg_t reg) //USE R11
 			{
-				copy_areg_into_F(target);
-				SCALE_Y_F(scaling_mag, scale_down);
-				copy_F_into_areg(target);
-			}
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 
-			void SCALE_X_AREG(AENUM target, int scaling_mag, bool scale_down)
-			{
-				copy_areg_into_F(target);
-				SCALE_X_F(scaling_mag, scale_down);
-				copy_F_into_areg(target);
-			}
-
-			void SCALE_AREG(AENUM target, int scaling_mag, bool scale_down)
-			{
-				copy_areg_into_F(target);
-				SCALE_F(scaling_mag, scale_down);
-				copy_F_into_areg(target);
-			}
-
-			int STEP_SCALE_AREG(AENUM target, int current_scaling_value, bool scale_down)
-			{
-				copy_areg_into_F(target);
-				int ret = STEP_SCALE_F(current_scaling_value, scale_down);
-				copy_F_into_areg(target);
-				return ret;
-			}
-
-			void HALF_SCALE_AREG(AENUM target) //USE R11
-			{
-				copy_areg_into_F(target);
-
-
-
-				scamp5_load_pattern(R11,0,128,255,127);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R4,R11);
-				scamp5_kernel_end();
-
-//				load_rect_into_DREG(DENUM::R11,128,0,128,256);
+				uint8_t x = 128;
+				uint8_t y = 0;
+				uint8_t w = 127;
+				uint8_t h = 255;
+				scamp5_load_rect(R11,y,x,y+h,x+w);
 				for(int n = 0; n < 64 ; n++)
 				{
 					scamp5_kernel_begin();
 						bus(NEWS,F);
 						WHERE(R11);
 							bus(F,XW);
-							DNEWS0(R11,FLAG);
-						ALL();
+						all();
 					scamp5_kernel_end();
+					scamp5_shift(R11,-1,0);
 				}
 
-				scamp5_load_pattern(R11,0,0,255,127);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R2,R11);
-				scamp5_kernel_end();
-
-//				load_rect_into_DREG(DENUM::R11,0,0,128,256);
+				x = 0;
+				y = 0;
+				w = 127;
+				h = 255;
+				scamp5_load_rect(R11,y,x,y+h,x+w);
 				for(int n = 0; n < 64 ; n++)
 				{
 					scamp5_kernel_begin();
 						bus(NEWS,F);
 						WHERE(R11);
 							bus(F,XE);
-							DNEWS0(R11,FLAG);
 						all();
 					scamp5_kernel_end();
+					scamp5_shift(R11,1,0);
 				}
 
-				scamp5_load_pattern(R11,128,0,127,255);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R3,R11);
-				scamp5_kernel_end();
-
-//				load_rect_into_DREG(DENUM::R11,0,128,256,128);
+				x = 0;
+				y = 128;
+				w = 255;
+				h = 127;
+				scamp5_load_rect(R11,y,x,y+h,x+w);
 				for(int n = 0; n < 64 ; n++)
 				{
 					scamp5_kernel_begin();
 						bus(NEWS,F);
 						WHERE(R11);
 							bus(F,XS);
-							DNEWS0(R11,FLAG);
 						all();
 					scamp5_kernel_end();
+					scamp5_shift(R11,0,-1);
 				}
 
-				scamp5_load_pattern(R11,0,0,127,255);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R1,R11);
-				scamp5_kernel_end();
-
-//				load_rect_into_DREG(DENUM::R11,0,0,256,128);
+				x = 0;
+				y = 0;
+				w = 255;
+				h = 127;
+				scamp5_load_rect(R11,y,x,y+h,x+w);
 				for(int n = 0; n < 64 ; n++)
 				{
 					scamp5_kernel_begin();
 						bus(NEWS,F);
 						WHERE(R11);
 							bus(F,XN);
-							DNEWS0(R11,FLAG);
 						all();
 					scamp5_kernel_end();
+					scamp5_shift(R11,0,1);
 				}
 
-				copy_F_into_areg(target);
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 			}
-
-			void POSITIVE_HALF_SCALE_AREG_VIA_R9_R10_R11(AENUM areg_to_scale,int step_value)
-			{
-				MISC_FUNCTIONS::copy_areg_into_F(areg_to_scale);
-
-				scamp5_load_in(D,-100);
-				scamp5_load_in(E,-100);
-				scamp5_load_in(step_value);
-				scamp5_kernel_begin();
-					sub(F,F,IN);
-					sub(F,F,IN);
-					sub(F,F,IN);
-					sub(F,F,IN);
-					where(F);
-						mov(D,IN);
-						add(D,D,IN);
-						add(D,D,IN);
-						add(D,D,IN);
-					NOT(R1,FLAG);
-					WHERE(R1);
-						add(F,F,IN);
-						add(F,F,IN);
-						add(F,F,IN);
-						add(F,F,IN);
-					all();
-
-					sub(F,F,IN);
-					sub(F,F,IN);
-					where(F);
-						mov(E,IN);
-						add(E,E,IN);
-						add(E,E,IN);
-						add(E,E,IN);
-					NOT(R1,FLAG);
-					WHERE(R1);
-						add(F,F,IN);
-						add(F,F,IN);
-					all();
-
-					sub(F,F,IN);
-					where(F);
-						mov(F,IN);
-						add(F,F,IN);
-						add(F,F,IN);
-						add(F,F,IN);
-					NOT(R1,FLAG);
-					WHERE(R1);
-						sub(F,F,IN);
-						sub(F,F,IN);
-						sub(F,F,IN);
-						sub(F,F,IN);
-					all();
-				scamp5_kernel_end();
-
-				scamp5_load_pattern(R11,0,128,255,127);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R4,R11);
-				scamp5_kernel_end();
-				for(int n = 0; n < 64 ; n++)
-				{
-					scamp5_kernel_begin();
-						bus(NEWS,D);
-						WHERE(R11);
-							bus(D,XW);
-						ALL();
-
-						bus(NEWS,E);
-						WHERE(R11);
-							bus(E,XW);
-						ALL();
-
-						bus(NEWS,F);
-						WHERE(R11);
-							bus(F,XW);
-							DNEWS0(R11,FLAG);
-						ALL();
-					scamp5_kernel_end();
-				}
-
-				scamp5_load_pattern(R11,0,0,255,127);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R2,R11);
-				scamp5_kernel_end();
-
-//				load_rect_into_DREG(DENUM::R11,0,0,128,256);
-				for(int n = 0; n < 64 ; n++)
-				{
-					scamp5_kernel_begin();
-						bus(NEWS,D);
-						WHERE(R11);
-							bus(D,XE);
-						ALL();
-
-						bus(NEWS,E);
-						WHERE(R11);
-							bus(E,XE);
-						ALL();
-
-						bus(NEWS,F);
-						WHERE(R11);
-							bus(F,XE);
-							DNEWS0(R11,FLAG);
-						ALL();
-					scamp5_kernel_end();
-				}
-
-				scamp5_load_pattern(R11,128,0,127,255);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R3,R11);
-				scamp5_kernel_end();
-
-//				load_rect_into_DREG(DENUM::R11,0,128,256,128);
-				for(int n = 0; n < 64 ; n++)
-				{
-					scamp5_kernel_begin();
-						bus(NEWS,D);
-						WHERE(R11);
-							bus(D,XS);
-						ALL();
-
-						bus(NEWS,E);
-						WHERE(R11);
-							bus(E,XS);
-						ALL();
-
-						bus(NEWS,F);
-						WHERE(R11);
-							bus(F,XS);
-							DNEWS0(R11,FLAG);
-						ALL();
-					scamp5_kernel_end();
-				}
-
-				scamp5_load_pattern(R11,0,0,127,255);
-
-				scamp5_kernel_begin();
-					CLR(R1,R2,R3,R4);
-					MOV(R1,R11);
-				scamp5_kernel_end();
-
-//				load_rect_into_DREG(DENUM::R11,0,0,256,128);
-				for(int n = 0; n < 64 ; n++)
-				{
-					scamp5_kernel_begin();
-						bus(NEWS,D);
-						WHERE(R11);
-							bus(D,XN);
-						ALL();
-
-						bus(NEWS,E);
-						WHERE(R11);
-							bus(E,XN);
-						ALL();
-
-						bus(NEWS,F);
-						WHERE(R11);
-							bus(F,XN);
-							DNEWS0(R11,FLAG);
-						ALL();
-					scamp5_kernel_end();
-				}
-
-
-				scamp5_load_in(step_value);
-				scamp5_kernel_begin();
-					where(D);
-					NOT(R1,FLAG);
-					WHERE(R1);
-						mov(D,IN);
-						sub(D,D,IN);
-
-					where(E);
-						add(D,D,IN);
-						add(D,D,IN);
-					where(F);
-						add(D,D,IN);
-					all();
-
-					mov(F,D);
-				scamp5_kernel_end();
-
-				copy_F_into_areg(areg_to_scale);
-
-//				//SCALE DREGS STORING THE AREG DATA
-//				scamp5_kernel_begin();
-//					CLR(R1,R2,R3,R4);
-//				scamp5_kernel_end();
-//				load_rect_into_DREG(DENUM::R0,128,0,128,256);
-//				for(int n = 0; n < 64 ; n++)
-//				{
-//					scamp5_kernel_begin();
-//						SET(R2);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R11);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R11
-//						WHERE(R12);
-//						DNEWS0(R11,FLAG);
-//						MOV(R12,R11); //FLAGGED BY R0
-//						MOV(R11,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R10);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R10
-//						WHERE(R12);
-//						DNEWS0(R10,FLAG);
-//						MOV(R12,R10); //FLAGGED BY R0
-//						MOV(R10,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R9);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R9
-//						WHERE(R12);
-//						DNEWS0(R9,FLAG);
-//						MOV(R12,R9); //FLAGGED BY R0
-//						MOV(R9,R12);
-//
-//						CLR(R2);
-//
-//						//MOV FLAG
-//						SET(R4);
-//						WHERE(R0);
-//						DNEWS0(R0,FLAG);
-//						CLR(R4);
-//					scamp5_kernel_end();
-//				}
-//
-//				load_rect_into_DREG(DENUM::R0,0,0,128,256);
-//				for(int n = 0; n < 64 ; n++)
-//				{
-//					scamp5_kernel_begin();
-//						SET(R4);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R11);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R11
-//						WHERE(R12);
-//						DNEWS0(R11,FLAG);
-//						MOV(R12,R11); //FLAGGED BY R0
-//						MOV(R11,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R10);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R10
-//						WHERE(R12);
-//						DNEWS0(R10,FLAG);
-//						MOV(R12,R10); //FLAGGED BY R0
-//						MOV(R10,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R9);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R9
-//						WHERE(R12);
-//						DNEWS0(R9,FLAG);
-//						MOV(R12,R9); //FLAGGED BY R0
-//						MOV(R9,R12);
-//
-//						CLR(R4);
-//
-//						//MOV FLAG
-//						SET(R2);
-//						WHERE(R0);
-//						DNEWS0(R0,FLAG);
-//						CLR(R2);
-//					scamp5_kernel_end();
-//				}
-//
-//
-//				load_rect_into_DREG(DENUM::R0,0,128,256,128);
-//				for(int n = 0; n < 64 ; n++)
-//				{
-//					scamp5_kernel_begin();
-//						SET(R1);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R11);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R11
-//						WHERE(R12);
-//						DNEWS0(R11,FLAG);
-//						MOV(R12,R11); //FLAGGED BY R0
-//						MOV(R11,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R10);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R10
-//						WHERE(R12);
-//						DNEWS0(R10,FLAG);
-//						MOV(R12,R10); //FLAGGED BY R0
-//						MOV(R10,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R9);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R9
-//						WHERE(R12);
-//						DNEWS0(R9,FLAG);
-//						MOV(R12,R9); //FLAGGED BY R0
-//						MOV(R9,R12);
-//
-//						CLR(R1);
-//
-//						//MOV FLAG
-//						SET(R3);
-//						WHERE(R0);
-//						DNEWS0(R0,FLAG);
-//						CLR(R3);
-//					scamp5_kernel_end();
-//				}
-//
-//				load_rect_into_DREG(DENUM::R0,0,0,256,128);
-//				for(int n = 0; n < 64 ; n++)
-//				{
-//					scamp5_kernel_begin();
-//						SET(R3);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R11);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R11
-//						WHERE(R12);
-//						DNEWS0(R11,FLAG);
-//						MOV(R12,R11); //FLAGGED BY R0
-//						MOV(R11,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R10);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R10
-//						WHERE(R12);
-//						DNEWS0(R10,FLAG);
-//						MOV(R12,R10); //FLAGGED BY R0
-//						MOV(R10,R12);
-//
-//						//SET R0, LOAD R9 INTO R12 AND THEN RESTORE R0 FLAG
-//						WHERE(R0);
-//						SET(R0);
-//						MOV(R12,R9);
-//						MOV(R0,FLAG);
-//
-//						//SHRINK R9
-//						WHERE(R12);
-//						DNEWS0(R9,FLAG);
-//						MOV(R12,R9); //FLAGGED BY R0
-//						MOV(R9,R12);
-//
-//						CLR(R3);
-//
-//						//MOV FLAG
-//						SET(R1);
-//						WHERE(R0);
-//						DNEWS0(R0,FLAG);
-//						CLR(R1);
-//					scamp5_kernel_end();
-//				}
-//
-//
-//				scamp5_kernel_begin();
-//					all();
-//				scamp5_kernel_end();
-//
-//				scamp5_load_in(F,0);
-//				scamp5_load_in(step_value);
-//				scamp5_kernel_begin();
-//					WHERE(R9);
-//						add(F,F,IN);
-//						add(F,F,IN);
-//						add(F,F,IN);
-//						add(F,F,IN);
-//
-//					WHERE(R10);
-//						add(F,F,IN);
-//						add(F,F,IN);
-//
-//					WHERE(R11);
-//						add(F,F,IN);
-//					ALL();
-//				scamp5_kernel_end();
-
-//				MISC_FUNCTIONS::copy_F_into_areg(areg_to_scale);
-			}
-
-
 		}
 	}
 }

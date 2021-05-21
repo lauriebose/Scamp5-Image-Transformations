@@ -1,5 +1,4 @@
 #include "IMG_SKEW.hpp"
-
 using namespace SCAMP5_PE;
 
 namespace IMGTF
@@ -8,12 +7,16 @@ namespace IMGTF
 	{
 		namespace ANALOG
 		{
-			void SKEWX_F(int skew_mag, bool skew_anti_clockwise,double offset)
+			void SKEWX(areg_t reg,int skew_mag, bool skew_anti_clockwise,double offset)
 			{
 				if(skew_mag == 0)
 				{
 					return;
 				}
+
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 
 				const int scalar_hack = 1000;
 				int step_size = (int)(scalar_hack*127.0/skew_mag);
@@ -55,34 +58,42 @@ namespace IMGTF
 						 scamp5_kernel_end();
 					}
 				}
+
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 			}
 
-			void SKEWX_F_TAN_RAD(double tan_of_angle,double offset)
+			void SKEWX_TAN_RAD(areg_t reg,double tan_of_angle,double offset)
 			{
 				double skew_mag = 127.0*tan_of_angle;
-				SKEWX_F((int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
+				SKEWX(reg,(int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
 			}
 
-			void SKEWX_F_RAD(double angle,double offset)
+			void SKEWX_RAD(areg_t reg,double angle,double offset)
 			{
 				double skew_mag = 127*tan_approx3(angle);
-				SKEWX_F((int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
+				SKEWX(reg,(int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
 			}
 
-			void SKEWX_F_DEG(double angle,double offset)
+			void SKEWX_DEG(areg_t reg,double angle,double offset)
 			{
 				double angle_in_radians = M_PI*angle/180.0;
-				SKEWX_F_RAD(angle_in_radians, offset);
+				SKEWX_RAD(reg,angle_in_radians, offset);
 			}
 
 			/////////////////////////////////////////////////////////////////////////
 
-			void SKEWY_F(int skew_mag, bool skew_anti_clockwise,double offset)
+			void SKEWY(areg_t reg,int skew_mag, bool skew_anti_clockwise,double offset)
 			{
 				if(skew_mag == 0)
 				{
 					return;
 				}
+
+				scamp5_dynamic_kernel_begin();
+					mov(F,reg);
+				scamp5_dynamic_kernel_end();
 
 				const int scalar_hack = 1000;
 				int step_size = (int)(scalar_hack*127.0/skew_mag);
@@ -125,25 +136,31 @@ namespace IMGTF
 						scamp5_kernel_end();
 					}
 				}
+
+				scamp5_dynamic_kernel_begin();
+					mov(reg,F);
+				scamp5_dynamic_kernel_end();
 			}
 
-			void SKEWY_F_TAN_RAD(double tan_of_angle,double offset)
+			void SKEWY_TAN_RAD(areg_t reg,double tan_of_angle,double offset)
 			{
 				double skew_mag = 127.0*tan_of_angle;
-				SKEWY_F((int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
+				SKEWY(reg,(int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
 			}
 
-			void SKEWY_F_RAD(double angle,double offset)
+			void SKEWY_RAD(areg_t reg,double angle,double offset)
 			{
 				double skew_mag = 127.0*tan_approx3(angle);
-				SKEWY_F((int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
+				SKEWY(reg,(int)fabs(skew_mag),skew_mag > 0 ? true : false, offset);
 			}
 
-			void SKEWY_F_DEG(double angle,double offset)
+			void SKEWY_DEG(areg_t reg,double angle,double offset)
 			{
 				double angle_in_radians = M_PI*angle/180.0;
-				SKEWY_F_RAD(angle_in_radians,offset);
+				SKEWY_RAD(reg,angle_in_radians,offset);
 			}
+
+			/////////////////////////////////////////////////////////////////////////
 
 			void STEP_SKEWX_CW_F(int step_number)
 			{

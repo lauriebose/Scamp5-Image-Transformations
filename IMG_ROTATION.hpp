@@ -2,7 +2,7 @@
 #include <math.h>
 
 #include "IMG_SKEW.hpp"
-#include "REGISTER_ENUMS.hpp"
+#include "IMG_TF_HELPER.hpp"
 
 using namespace SCAMP5_PE;
 
@@ -15,14 +15,9 @@ namespace IMGTF
 	{
 		namespace ANALOG
 		{
-			void ROT_3SKEWS_F(double angle_radians);
-			void ROT_3SKEWS_AREG(AENUM target,double angle_radians);
-
-			void ROT_2SKEWS_F(int current_rot_value);
-			void ROT_2SKEWS_AREG(AENUM target,int current_rot_value);
-
-			int STEP_ROT_2SKEWS_F(int current_rot_value, bool rot_ACW);
-			int STEP_ROT_2SKEWS_AREG(AENUM target,int current_rot_value, bool rot_ACW);
+			void ROT_3SKEWS(areg_t reg,double angle_radians);
+			void ROT_2SKEWS(areg_t reg,int current_rot_value);
+			int STEP_ROT_2SKEWS(areg_t reg,int current_rot_value, bool rot_ACW);
 		}
 	}
 }

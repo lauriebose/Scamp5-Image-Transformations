@@ -2,8 +2,7 @@
 #include <math.h>
 
 #include "IMG_SKEW_DIGITAL.hpp"
-#include "MISC_FUNCTIONS.hpp"
-#include "REGISTER_ENUMS.hpp"
+#include "IMG_TF_HELPER.hpp"
 
 using namespace SCAMP5_PE;
 
@@ -16,14 +15,9 @@ namespace IMGTF
 	{
 		namespace DIGITAL
 		{
-			void ROT_3SKEWS_R11(double angle_radians);
-			void ROT_3SKEWS_DREG(DENUM target, double angle_radians);
-
-			void ROT_2SKEWS_R11(int rotation_steps);
-			void ROT_2SKEWS_DREG(DENUM target, int rotation_steps);
-
-			int STEP_ROT_2SKEWS_R11(int current_rot_value, bool rot_ACW);
-			int STEP_ROT_2SKEWS_DREG(DENUM target, int current_rot_value, bool rot_ACW);
+			void ROT_3SKEWS(dreg_t reg, double angle_radians);
+			void ROT_2SKEWS(dreg_t reg, int rotation_steps);
+			int STEP_ROT_2SKEWS(dreg_t reg,int current_rot_value, bool rot_ACW);
 		}
 	}
 }
