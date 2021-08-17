@@ -21,9 +21,12 @@ namespace IMGTF
 				const int scalar_hack = 1000;
 				int step_size = (int)(scalar_hack*127.0/skew_mag);
 
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 
 				scamp5_kernel_begin()
 					CLR(R1,R3);
@@ -66,10 +69,12 @@ namespace IMGTF
 					MOV(R11,R12);
 				scamp5_kernel_end();
 
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
-
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(reg,R11);
+					scamp5_dynamic_kernel_end();
+				}
 			}
 
 			void SKEWX_TAN_RAD(dreg_t reg,double tan_of_angle,double offset)
@@ -102,9 +107,12 @@ namespace IMGTF
 				const int scalar_hack = 1000;
 				int step_size = (int)(scalar_hack*127.0/skew_mag);
 
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 
 				scamp5_kernel_begin()
 					CLR(R2,R4);
@@ -147,9 +155,12 @@ namespace IMGTF
 					MOV(R11,R12);
 				scamp5_kernel_end();
 
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(reg,R11);
+					scamp5_dynamic_kernel_end();
+				}
 			}
 
 			void SKEWY_TAN_RAD(dreg_t reg,double tan_of_angle,double offset)

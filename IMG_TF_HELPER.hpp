@@ -8,6 +8,9 @@ using namespace SCAMP5_PE;
 namespace IMGTF
 {
 	unsigned char reverse_byte(unsigned char x);
+
+	bool dreg_eql(dreg_t ra, dreg_t rb);
+
 	double sin_approx3(double angle);
 	double cos_approx3(double angle);
 	double acos_approx3(double value);

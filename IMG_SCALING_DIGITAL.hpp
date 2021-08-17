@@ -1,6 +1,8 @@
 #include <scamp5.hpp>
 #include <math.h>
 
+#include "IMG_TF_HELPER.hpp"
+
 using namespace SCAMP5_PE;
 
 #ifndef IMG_SCALING_DIGITAL

@@ -1,4 +1,4 @@
-#include "IMG_SCALING.hpp"
+#include "IMG_SCALING_DIGITAL.hpp"
 
 static const int scaling_rowcol_order[] = {
 		64, 32, 98, 16, 83, 50, 118, 8, 77, 43, 113, 26, 97, 62, 4, 77, 41, 114, 23, 97, 61, 14, 90, 53, 34, 113, 74, 2,
@@ -205,9 +205,12 @@ namespace IMGTF
 
 			void SCALE_Y(dreg_t reg,int scaling_mag,bool scale_down)
 			{
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -222,17 +225,23 @@ namespace IMGTF
 						STEP_SCALE_DOWNY_R11(n);
 					}
 				}
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 			}
 
 
 			void SCALE_X(dreg_t reg,int scaling_mag,bool scale_down)
 			{
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -247,17 +256,23 @@ namespace IMGTF
 						STEP_SCALE_DOWNX_R11(n);
 					}
 				}
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 			}
 
 
 			void SCALE(dreg_t reg,int scaling_mag,bool scale_down)
 			{
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 				if(!scale_down)
 				{
 					for(unsigned char n = 0 ; n < scaling_mag ; n++)
@@ -272,18 +287,24 @@ namespace IMGTF
 						STEP_SCALE_DOWN_R11(n);
 					}
 				}
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 			}
 
 
 
 			int STEP_SCALE(dreg_t reg,int current_scaling_value, bool scale_DOWN)
 			{
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 				if(current_scaling_value > 0)
 				{
 					if(!scale_DOWN)
@@ -332,9 +353,12 @@ namespace IMGTF
 						}
 					}
 				}
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 				return current_scaling_value;
 			}
 

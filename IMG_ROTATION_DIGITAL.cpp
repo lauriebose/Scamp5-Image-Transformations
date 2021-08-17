@@ -27,9 +27,12 @@ namespace IMGTF
 
 			void ROT_2SKEWS(dreg_t reg, int rotation_steps)
 			{
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 
 				//EACH STEP APPROXIMATELY 0.555... DEGRESS (FROM 1.0/1.8)
 				int current_rotation = rotation_steps;
@@ -50,16 +53,22 @@ namespace IMGTF
 					}
 				}
 
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(reg,R11);
+					scamp5_dynamic_kernel_end();
+				}
 			}
 
 			int STEP_ROT_2SKEWS(dreg_t reg, int current_rot_value, bool rot_ACW)
 			{
-				scamp5_dynamic_kernel_begin();
-					MOV(R11,reg);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(R11,reg);
+					scamp5_dynamic_kernel_end();
+				}
 
 				//EACH STEP APPROXIMATELY 0.555... DEGRESS (FROM 1.0/1.8)
 				if(current_rot_value > 0)
@@ -111,9 +120,12 @@ namespace IMGTF
 					}
 				}
 
-				scamp5_dynamic_kernel_begin();
-					MOV(reg,R11);
-				scamp5_dynamic_kernel_end();
+				if(!dreg_eql(reg,R11))
+				{
+					scamp5_dynamic_kernel_begin();
+						MOV(reg,R11);
+					scamp5_dynamic_kernel_end();
+				}
 
 				return current_rot_value;
 			}

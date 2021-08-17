@@ -122,9 +122,19 @@ void scamp5_main(){
 
 		//SCALING
 		timer.reset();
-		IMGTF::SCALING::DIGITAL::SCALE(R5,abs(scale),scale > 0 ? 0 : 1);
-		IMGTF::SCALING::DIGITAL::SCALE_X(R5,abs(scalex),scalex > 0 ? 0 : 1);
-		IMGTF::SCALING::DIGITAL::SCALE_Y(R5,abs(scaley),scaley > 0 ? 0 : 1);
+		if(abs(scale) != 0)
+		{
+			IMGTF::SCALING::DIGITAL::SCALE(R11,abs(scale),scale > 0 ? 0 : 1);
+		}
+		if(abs(scalex) != 0)
+		{
+			IMGTF::SCALING::DIGITAL::SCALE_X(R11,abs(scalex),scalex > 0 ? 0 : 1);
+		}
+		if(abs(scaley) != 0)
+		{
+			IMGTF::SCALING::DIGITAL::SCALE_Y(R11,abs(scaley),scaley > 0 ? 0 : 1);
+		}
+
 		if(half_scale)
 		{
 			IMGTF::SCALING::DIGITAL::HALF_SCALE(R5);
@@ -133,41 +143,47 @@ void scamp5_main(){
 
 		//SHIFTING
 		timer.reset();
-		scamp5_dynamic_kernel_begin();
-			CLR(R1,R2,R3,R4);
-			if(shiftx > 0)
-			{
-				SET(R2);
-			}
-			else
-			{
-				SET(R4);
-			}
-		scamp5_dynamic_kernel_end();
-		for(int x = 0 ; x < abs(shiftx) ; x++)
+		if(abs(shiftx) > 0)
 		{
-			scamp5_kernel_begin();
-				DNEWS0(R11,R5);
-				MOV(R5,R11);
-			scamp5_kernel_end();
+			scamp5_dynamic_kernel_begin();
+				CLR(R1,R2,R3,R4);
+				if(shiftx > 0)
+				{
+					SET(R2);
+				}
+				else
+				{
+					SET(R4);
+				}
+			scamp5_dynamic_kernel_end();
+			for(int x = 0 ; x < abs(shiftx) ; x++)
+			{
+				scamp5_kernel_begin();
+					DNEWS0(R11,R5);
+					MOV(R5,R11);
+				scamp5_kernel_end();
+			}
 		}
-		scamp5_dynamic_kernel_begin();
-			CLR(R1,R2,R3,R4);
-			if(shifty > 0)
-			{
-				SET(R3);
-			}
-			else
-			{
-				SET(R1);
-			}
-		scamp5_dynamic_kernel_end();
-		for(int y = 0 ; y < abs(shifty) ; y++)
+		if(abs(shifty) > 0)
 		{
-			scamp5_kernel_begin();
-				DNEWS0(R11,R5);
-				MOV(R5,R11);
-			scamp5_kernel_end();
+			scamp5_dynamic_kernel_begin();
+				CLR(R1,R2,R3,R4);
+				if(shifty > 0)
+				{
+					SET(R3);
+				}
+				else
+				{
+					SET(R1);
+				}
+			scamp5_dynamic_kernel_end();
+			for(int y = 0 ; y < abs(shifty) ; y++)
+			{
+				scamp5_kernel_begin();
+					DNEWS0(R11,R5);
+					MOV(R5,R11);
+				scamp5_kernel_end();
+			}
 		}
 		dreg_translation_time = timer.get_usec();
 
@@ -180,11 +196,17 @@ void scamp5_main(){
 		IMGTF::ROTATION::DIGITAL::ROT_2SKEWS(R6,k);
 		dreg_2skewrot_time = timer.get_usec();
 
+
+		scamp5_kernel_begin();
+				MOV(R11,R5);
+			scamp5_kernel_end();
 		//ROTATION 3 SKEWS
 		timer.reset();
-		IMGTF::ROTATION::DIGITAL::ROT_3SKEWS(R5,M_PI*rot_angle/180.0);
+		IMGTF::ROTATION::DIGITAL::ROT_3SKEWS(R11,M_PI*rot_angle/180.0);
 		dreg_3skewrot_time = timer.get_usec();
-
+		scamp5_kernel_begin();
+				MOV(R5,R11);
+			scamp5_kernel_end();
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//OUTPUT

@@ -41,6 +41,11 @@ namespace IMGTF
 		return table[x];
 	}
 
+	bool dreg_eql(dreg_t ra, dreg_t rb)
+	{
+	    return ra.LR_bits == rb.LR_bits && ra.LR_index == rb.LR_index && ra.RR_bits == rb.RR_bits && ra.RR_index ==  rb.RR_index;
+	}
+
 	double sin_approx3(double angle)
 	{
 		return angle-(angle*angle*angle)/6.0+(angle*angle*angle*angle*angle)/120.0;
