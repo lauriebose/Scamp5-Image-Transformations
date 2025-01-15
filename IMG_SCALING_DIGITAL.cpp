@@ -228,7 +228,7 @@ namespace IMGTF
 				if(!dreg_eql(reg,R11))
 				{
 					scamp5_dynamic_kernel_begin();
-						MOV(R11,reg);
+						MOV(reg,R11);
 					scamp5_dynamic_kernel_end();
 				}
 			}
@@ -259,7 +259,7 @@ namespace IMGTF
 				if(!dreg_eql(reg,R11))
 				{
 					scamp5_dynamic_kernel_begin();
-						MOV(R11,reg);
+						MOV(reg,R11);
 					scamp5_dynamic_kernel_end();
 				}
 			}
@@ -290,7 +290,7 @@ namespace IMGTF
 				if(!dreg_eql(reg,R11))
 				{
 					scamp5_dynamic_kernel_begin();
-						MOV(R11,reg);
+						MOV(reg,R11);
 					scamp5_dynamic_kernel_end();
 				}
 			}
@@ -356,7 +356,7 @@ namespace IMGTF
 				if(!dreg_eql(reg,R11))
 				{
 					scamp5_dynamic_kernel_begin();
-						MOV(R11,reg);
+						MOV(reg,R11);
 					scamp5_dynamic_kernel_end();
 				}
 				return current_scaling_value;

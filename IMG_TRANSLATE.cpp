@@ -12,7 +12,7 @@ namespace IMGTF
 	{
 		namespace ANALOG
 		{
-			void POSITIVE_AREG_shift_via_R9_R10_R11(AENUM areg_to_shift,int shiftx, int shifty, int step_value = 25)
+			void POSITIVE_AREG_shift_via_R9_R10_R11(ENUM_AREG areg_to_shift,int shiftx, int shifty, int step_value = 25)
 			{
 				MISC_FUNCTIONS::copy_areg_into_F(areg_to_shift);
 

@@ -124,15 +124,15 @@ void scamp5_main(){
 		timer.reset();
 		if(abs(scale) != 0)
 		{
-			IMGTF::SCALING::DIGITAL::SCALE(R11,abs(scale),scale > 0 ? 0 : 1);
+			IMGTF::SCALING::DIGITAL::SCALE(R5,abs(scale),scale > 0 ? 0 : 1);
 		}
 		if(abs(scalex) != 0)
 		{
-			IMGTF::SCALING::DIGITAL::SCALE_X(R11,abs(scalex),scalex > 0 ? 0 : 1);
+			IMGTF::SCALING::DIGITAL::SCALE_X(R5,abs(scalex),scalex > 0 ? 0 : 1);
 		}
 		if(abs(scaley) != 0)
 		{
-			IMGTF::SCALING::DIGITAL::SCALE_Y(R11,abs(scaley),scaley > 0 ? 0 : 1);
+			IMGTF::SCALING::DIGITAL::SCALE_Y(R5,abs(scaley),scaley > 0 ? 0 : 1);
 		}
 
 		if(half_scale)
